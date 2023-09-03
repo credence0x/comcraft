@@ -1,7 +1,7 @@
 #[system]
 mod MakeStake {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Position2D, Position3D, PositionOccupation};
+    use comcraft::components::position::{Coord, VoxelCoord, PositionOccupation};
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::claim::Claim;
@@ -20,7 +20,7 @@ mod MakeStake {
 
 
     // Stake entity = concat(address | chunk.x | chunk.y)
-    fn get_stake_entity(chunk: Position2D, entity: ContractAddress) -> ID {
+    fn get_stake_entity(chunk: Coord, entity: ContractAddress) -> ID {
         let entity_felt: felt252 = entity.into();
         let entity_u256: u256 = entity_felt.into();
         (u256Helpers::shl(entity_u256, 64) | (u64Helpers::shl(chunk.x.mag.into(), 32_u64) | chunk.y.mag.into()).into())
@@ -30,7 +30,7 @@ mod MakeStake {
         get!(world, stake_id, Stake)
     }
 
-    fn execute(ctx: Context, block_id: ID, chunk: Position2D) {
+    fn execute(ctx: Context, block_id: ID, chunk: Coord) {
 
         let block_owned_by = get!(ctx.world, block_id, OwnedBy);        
         assert(block_owned_by.address == ctx.origin, 'block not owned by player');

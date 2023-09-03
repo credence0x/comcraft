@@ -9,13 +9,13 @@ impl SerdeLeni32 of SerdeLen<i32> {
 }
 
 #[derive(Copy, Drop, Serde)]
-struct Position2D {
+struct Coord {
     x: i32,
     y: i32
 }
 
 #[derive(Copy, Drop, Serde)]
-struct Position3D {
+struct VoxelCoord {
     x: i32,
     y: i32,
     z: i32

@@ -1,5 +1,5 @@
 use comcraft::constants::CHUNK;
-use comcraft::components::position::{Position2D, Position3D};
+use comcraft::components::position::{Coord, VoxelCoord};
 
 
 mod u64Helpers {
@@ -41,8 +41,8 @@ mod u256Helpers {
 }
 
 
-fn get_chunk_coord(coord: Position3D) -> Position2D  {
-  Position2D {
+fn get_chunk_coord(coord: VoxelCoord) -> Coord  {
+  Coord {
     x: coord.x / CHUNK(),
     y: coord.z / CHUNK(), // yes y == coord.z
   }

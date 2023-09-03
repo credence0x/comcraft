@@ -1,7 +1,7 @@
 #[system]
 mod BulkStake {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Position2D};
+    use comcraft::components::position::{Coord};
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::stake::Stake;
@@ -17,7 +17,7 @@ mod BulkStake {
     use core::option::OptionTrait;
 
    
-    fn execute(ctx: Context, block_ids: Span<ID>, chunk: Position2D) {
+    fn execute(ctx: Context, block_ids: Span<ID>, chunk: Coord) {
 
         let mut i = 0;
         loop {

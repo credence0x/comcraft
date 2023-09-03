@@ -3,7 +3,7 @@ mod CreativeBuild  {
     use comcraft::alias::ID;
     use comcraft::components::config::GameConfig;
     use comcraft::components::item::Item;
-    use comcraft::components::position::{Position, PositionOccupation, Position3D};
+    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord};
 
     use comcraft::constants::GodID;
 
@@ -11,7 +11,7 @@ mod CreativeBuild  {
 
     use core::traits::Into;
 
-    fn execute(ctx: Context, block_id: ID, coord: Position3D) {
+    fn execute(ctx: Context, block_id: ID, coord: VoxelCoord) {
         let GodID_u256: ID = GodID.into();
         let game_config = get!(ctx.world, GodID_u256, GameConfig);
         assert(game_config.creative_mode == false, 'CREATIVE MODE DISABLED');

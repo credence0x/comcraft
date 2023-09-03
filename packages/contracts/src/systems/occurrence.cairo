@@ -1,16 +1,16 @@
 #[system]
 mod Occurence {
-    use comcraft::components::position::{Position3D};
+    use comcraft::components::position::{VoxelCoord};
     use comcraft::libraries::terrain;
     use comcraft::prototypes::blocks;
 
     use dojo::world::Context;
 
-    fn execute(ctx: Context, block_type: felt252, coord: Position3D) -> felt252 {
+    fn execute(ctx: Context, block_type: felt252, coord: VoxelCoord) -> felt252 {
         get_occurrence(block_type, coord)
     }
 
-    fn get_occurrence(block_type: felt252, coord: Position3D) -> felt252 {
+    fn get_occurrence(block_type: felt252, coord: VoxelCoord) -> felt252 {
         if block_type == blocks::GrassID {return terrain::Grass(coord);}
         if block_type == blocks::DirtID {return terrain::Dirt(coord);}
         if block_type == blocks::StoneID {return terrain::Stone(coord);}

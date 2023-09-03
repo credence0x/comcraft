@@ -4,7 +4,7 @@ mod Mine {
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     
-    use comcraft::components::position::{Position3D,PositionOccupation, Position};
+    use comcraft::components::position::{VoxelCoord,PositionOccupation, Position};
     use comcraft::systems::claim::{MakeClaim};
     use comcraft::systems::occurrence::{Occurence};
     use comcraft::libraries::terrain;
@@ -21,7 +21,7 @@ mod Mine {
 
 
 
-    fn execute(ctx: Context, coord: Position3D, block_type: felt252) -> ID {
+    fn execute(ctx: Context, coord: VoxelCoord, block_type: felt252) -> ID {
 
         assert(block_type != blocks::AirID, 'can not mine air');
         assert(block_type != blocks::WaterID, 'can not mine water');

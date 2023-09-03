@@ -1,7 +1,7 @@
 #[system]
 mod MakeClaim {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Position2D, Position3D, PositionOccupation};
+    use comcraft::components::position::{Coord, VoxelCoord, PositionOccupation};
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::claim::Claim;
@@ -17,20 +17,20 @@ mod MakeClaim {
 
 
     // Chunk entity = concat(chunk.x | chunk.y)
-    fn get_chunk_entity(chunk: Position2D) -> ID {
+    fn get_chunk_entity(chunk: Coord) -> ID {
         (u64Helpers::shl(chunk.x.mag.into(), 32_u64) | chunk.y.mag.into()).into()
     }
     
-    fn get_claim_in_chunk(world: IWorldDispatcher, chunk: Position2D) -> Claim  {
+    fn get_claim_in_chunk(world: IWorldDispatcher, chunk: Coord) -> Claim  {
         get!(world, get_chunk_entity(chunk), Claim)
     }
 
-    fn get_claim_at_coord(world: IWorldDispatcher, position: Position3D) -> Claim {
+    fn get_claim_at_coord(world: IWorldDispatcher, position: VoxelCoord) -> Claim {
         get_claim_in_chunk(world, get_chunk_coord(position))
     }
 
 
-    fn execute(ctx: Context, chunk: Position2D ) {
+    fn execute(ctx: Context, chunk: Coord ) {
          
         let sender_stake_in_chunk: Stake = MakeStake::get_stake_in_chunk(
             ctx.world, 

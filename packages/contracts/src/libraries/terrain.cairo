@@ -1,4 +1,4 @@
-use comcraft::components::position::{Position2D, Position3D};
+use comcraft::components::position::{Coord, VoxelCoord};
 use comcraft::constants::{Biome, STRUCTURE_CHUNK, STRUCTURE_CHUNK_CENTER};
 use comcraft::prototypes::blocks::{AirID, GrassID, DirtID, LogID, StoneID, SandID, GlassID, WaterID, CobblestoneID, MossyCobblestoneID, CoalID, CraftingID, IronID, GoldID, DiamondID, LeavesID, PlanksID, RedFlowerID, GrassPlantID, OrangeFlowerID, MagentaFlowerID, LightBlueFlowerID, LimeFlowerID, PinkFlowerID, GrayFlowerID, LightGrayFlowerID, CyanFlowerID, PurpleFlowerID, BlueFlowerID, GreenFlowerID, BlackFlowerID, KelpID, WoolID, OrangeWoolID, MagentaWoolID, LightBlueWoolID, YellowWoolID, LimeWoolID, PinkWoolID, GrayWoolID, LightGrayWoolID, CyanWoolID, PurpleWoolID, BlueWoolID, BrownWoolID, GreenWoolID, RedWoolID, BlackWoolID, SpongeID, SnowID, ClayID, BedrockID, BricksID};
 
@@ -86,7 +86,7 @@ struct Tuple {
 }
 
 
-fn get_terrain_block(coord: Position3D) -> felt252 {
+fn get_terrain_block(coord: VoxelCoord) -> felt252 {
     let biome = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome.span());
     _get_terrain_block(coord.x, coord.y, coord.z, height, biome)
@@ -292,13 +292,13 @@ fn get_chunk_coord(x: i32, z: i32) -> (i32, i32) {
 
 
 
-fn get_chunk_offset_and_height(x: i32, y: i32, z: i32) -> (i32, Position3D) {
+fn get_chunk_offset_and_height(x: i32, y: i32, z: i32) -> (i32, VoxelCoord) {
     let (chunk_x, chunk_z) = get_chunk_coord(x, z);
     let chunk_center_x = chunk_x * STRUCTURE_CHUNK() + STRUCTURE_CHUNK_CENTER();
     let chunk_center_z = chunk_z * STRUCTURE_CHUNK() + STRUCTURE_CHUNK_CENTER();
     let biome = get_biome(chunk_center_x, chunk_center_z);
     let height = get_height(chunk_center_x, chunk_center_z, biome.span());
-    let offset = Position3D {
+    let offset = VoxelCoord {
         x: x - chunk_x * STRUCTURE_CHUNK(),
         y: y - height,
         z: z - chunk_z * STRUCTURE_CHUNK()
@@ -345,7 +345,7 @@ fn pos(x: Fixed) -> Fixed {
     if x < _0() { _0() } else { x }
 }
 
-fn coord_eq(a: Position3D, b: Array<u8>) -> bool {
+fn coord_eq(a: VoxelCoord, b: Array<u8>) -> bool {
     a.x == i32 { mag: (*b[0]).into(), sign: false } &&
     a.y == i32 { mag: (*b[1]).into(), sign: false } &&
     a.z == i32 { mag: (*b[2]).into(), sign: false }
@@ -463,7 +463,7 @@ fn valleys(x: Fixed) -> Fixed {
 // // Block occurrence functions
 // //////////////////////////////////////////////////////////////////////////////////////
 
-fn Air(coord: Position3D) -> felt252 {
+fn Air(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     _Air(coord.y, height)
@@ -485,7 +485,7 @@ fn _Air(y: i32, height: i32) -> felt252 {
 
 
 
-fn Water(coord: Position3D) -> felt252 {
+fn Water(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     _Water(coord.y, height)
@@ -503,7 +503,7 @@ fn _Water(y: i32, height: i32) -> felt252 {
 
 
 
-fn Bedrock(coord: Position3D) -> felt252 {
+fn Bedrock(coord: VoxelCoord) -> felt252 {
     _Bedrock(coord.y)
 }
 
@@ -518,7 +518,7 @@ fn _Bedrock(y: i32) -> felt252 {
 
 
 
-fn Sand(coord: Position3D) -> felt252 {
+fn Sand(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -542,7 +542,7 @@ fn _Sand(y: i32, height: i32, biome: u8, distance_from_height: i32) -> felt252 {
 
 
 
-fn Diamond(coord: Position3D) -> felt252 {
+fn Diamond(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -570,7 +570,7 @@ fn _Diamond(x: i32, y: i32, z: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn Coal(coord: Position3D) -> felt252 {
+fn Coal(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -599,7 +599,7 @@ fn _Coal(x: i32, y: i32, z: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn Snow(coord: Position3D) -> felt252 {
+fn Snow(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     _Snow(coord.y, height, *biome_values[Biome::Mountains.into()])
@@ -619,7 +619,7 @@ fn _Snow(y: i32, height: i32, mountain_biome: Fixed) -> felt252 {
 
 
 
-fn Stone(coord: Position3D) -> felt252 {
+fn Stone(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -640,7 +640,7 @@ fn _Stone(y: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn Clay(coord: Position3D) -> felt252 {
+fn Clay(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -662,7 +662,7 @@ fn _Clay(y: i32, height: i32, biome: u8, distance_from_height: i32) -> felt252 {
 
 
 
-fn Grass(coord: Position3D) -> felt252 {
+fn Grass(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -684,7 +684,7 @@ fn _Grass(y: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn Dirt(coord: Position3D) -> felt252 {
+fn Dirt(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -704,7 +704,7 @@ fn _Dirt(y: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn SmallPlant(coord: Position3D) -> felt252 {
+fn SmallPlant(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -753,7 +753,7 @@ fn _SmallPlant(x: i32, y: i32, z: i32, height: i32, biome: u8) -> felt252 {
 
 
 
-fn Structure(coord: Position3D) -> felt252 {
+fn Structure(coord: VoxelCoord) -> felt252 {
     let biome_values = get_biome(coord.x, coord.z);
     let height = get_height(coord.x, coord.z, biome_values.span());
     let biome = get_max_biome(biome_values.span());
@@ -789,7 +789,7 @@ fn _Structure(x: i32, y: i32, z: i32, height: i32, biome: u8) -> felt252 {
 }
 
 
-fn Tree(offset: Position3D) -> felt252 {
+fn Tree(offset: VoxelCoord) -> felt252 {
     if (coord_eq(offset, array![3, 0, 3])) { return LogID; }
     if (coord_eq(offset, array![3, 1, 3])) { return LogID; }
     if (coord_eq(offset, array![3, 2, 3])) { return LogID; }
@@ -812,7 +812,7 @@ fn Tree(offset: Position3D) -> felt252 {
 }
 
 
-fn WoolTree(offset: Position3D) -> felt252 {
+fn WoolTree(offset: VoxelCoord) -> felt252 {
     if (coord_eq(offset, array![3, 0, 3])) { return LogID; }
     if (coord_eq(offset, array![3, 1, 3])) { return LogID; }
     if (coord_eq(offset, array![3, 2, 3])) { return LogID; }

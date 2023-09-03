@@ -1,7 +1,7 @@
 #[system]
 mod Build  {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Position, PositionOccupation, Position3D};
+    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord};
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::claim::Claim;
     use comcraft::systems::claim::{MakeClaim};
@@ -11,12 +11,12 @@ mod Build  {
     use starknet::contract_address_const;
 
 
-    fn execute(ctx: Context, block_id: ID, coord: Position3D ) {
+    fn execute(ctx: Context, block_id: ID, coord: VoxelCoord ) {
         let block_owned_by = get!(ctx.world, block_id, OwnedBy);        
         assert(block_owned_by.address == ctx.origin, 'block not owned by player');
 
         // Require no other ECS blocks at this position except Air
-        let Position3D { x, y, z } = coord;
+        let VoxelCoord { x, y, z } = coord;
         let position_occupation = get!(ctx.world, (x, y, z),  PositionOccupation);
         if position_occupation.occupied_by_non_air != 0 {
             assert(false, 'cant build at occupied coord');
