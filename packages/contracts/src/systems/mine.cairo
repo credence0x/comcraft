@@ -4,7 +4,7 @@ mod Mine {
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     
-    use comcraft::components::position::{VoxelCoord,PositionOccupation, Position};
+    use comcraft::components::position::{VoxelCoord, VoxelCoordTrait, PositionOccupation, Position};
     use comcraft::systems::claim::{MakeClaim};
     use comcraft::systems::occurrence::{Occurence};
     use comcraft::libraries::terrain;
@@ -30,7 +30,11 @@ mod Mine {
         let claimer = MakeClaim::get_claim_at_coord(ctx.world, coord).claimer;
         assert(claimer == contract_address_const::<0>() || claimer == ctx.origin, 'cant mine in claimed chunk');
 
-        let position_occupation = get!(ctx.world, (coord.x, coord.y, coord.z ), (PositionOccupation));
+        let position_occupation = get!(
+            ctx.world, 
+            coord.hash(),
+            (PositionOccupation)
+        );
         let mut entity_id: ID = 0;
 
         if (position_occupation.occupied_by_non_air == 0 && position_occupation.occupied_by_air == 0) {
@@ -57,14 +61,15 @@ mod Mine {
                     },
                     Position {
                         id: air_entity,
-                        x: coord.x,
-                        y: coord.y,
-                        z: coord.z
+                        x: coord.x.mag,
+                        x_neg: coord.x.sign,
+                        y: coord.y.mag,
+                        y_neg: coord.y.sign,
+                        z: coord.z.mag,
+                        z_neg: coord.z.sign,
                     },
                     PositionOccupation {
-                        x: coord.x,
-                        y: coord.y,
-                        z: coord.z,
+                        hash: coord.hash(),
                         occupied_by_air: air_entity,
                         occupied_by_non_air: 0
                     }
@@ -83,14 +88,15 @@ mod Mine {
                     // remove position
                     Position {
                         id: entity_id,
-                        x: i32Impl::new(0, false),
-                        y: i32Impl::new(0, false),
-                        z: i32Impl::new(0, false)
+                        x: 0,
+                        x_neg: false,
+                        y: 0,
+                        y_neg: false,
+                        z: 0,
+                        z_neg: false,
                     },
                     PositionOccupation {
-                        x: coord.x,
-                        y: coord.y,
-                        z: coord.z,
+                        hash: coord.hash(),
                         occupied_by_air: position_occupation.occupied_by_air,
                         occupied_by_non_air: 0
                     }

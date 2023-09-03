@@ -1,7 +1,7 @@
 #[system]
 mod Build  {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord};
+    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord, VoxelCoordTrait};
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::claim::Claim;
     use comcraft::systems::claim::{MakeClaim};
@@ -17,7 +17,11 @@ mod Build  {
 
         // Require no other ECS blocks at this position except Air
         let VoxelCoord { x, y, z } = coord;
-        let position_occupation = get!(ctx.world, (x, y, z),  PositionOccupation);
+        let position_occupation = get!(
+            ctx.world, 
+            coord.hash(),
+            PositionOccupation
+        );
         if position_occupation.occupied_by_non_air != 0 {
             assert(false, 'cant build at occupied coord');
         }
@@ -30,13 +34,18 @@ mod Build  {
 
         set!(ctx.world, (
                 PositionOccupation { 
-                    x,y,z,
+                    hash: coord.hash(),
                     occupied_by_non_air: block_id,
                     occupied_by_air: position_occupation.occupied_by_air
                 },
                 Position {
                     id: block_id,
-                    x,y,z
+                    x: x.mag,
+                    x_neg: x.sign,
+                    y: y.mag,
+                    y_neg: y.sign,
+                    z: z.mag,
+                    z_neg: z.sign,
                 },
                 OwnedBy {
                     id: block_id,

@@ -1,7 +1,7 @@
 #[system]
 mod MakeClaim {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Coord, VoxelCoord, PositionOccupation};
+    use comcraft::components::position::{Coord, VoxelCoord };
     use comcraft::components::item::Item;
     use comcraft::components::owned_by::OwnedBy;
     use comcraft::components::claim::Claim;

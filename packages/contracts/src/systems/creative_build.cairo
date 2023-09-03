@@ -3,7 +3,7 @@ mod CreativeBuild  {
     use comcraft::alias::ID;
     use comcraft::components::config::GameConfig;
     use comcraft::components::item::Item;
-    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord};
+    use comcraft::components::position::{Position, PositionOccupation, VoxelCoord, VoxelCoordTrait};
 
     use comcraft::constants::GodID;
 
@@ -20,7 +20,11 @@ mod CreativeBuild  {
         let block_type = item.value;
 
         let entity_id: u256 = ctx.world.uuid().into();
-        let position_occupation = get!(ctx.world, (coord.x, coord.y, coord.z), PositionOccupation);
+        let position_occupation = get!(
+            ctx.world, 
+            coord.hash(),
+            PositionOccupation
+        );
         set!(ctx.world, (
             Item {
                 id: entity_id,
@@ -28,14 +32,15 @@ mod CreativeBuild  {
             },
             Position {
                 id: entity_id,
-                x: coord.x,
-                y: coord.y,
-                z: coord.z
+                x: coord.x.mag,
+                x_neg: coord.x.sign,
+                y: coord.y.mag,
+                y_neg: coord.y.sign,
+                z: coord.z.mag,
+                z_neg: coord.z.sign,
             },
             PositionOccupation {
-                x: coord.x,
-                y: coord.y,
-                z: coord.z,
+                hash: coord.hash(),
                 occupied_by_non_air: entity_id,
                 occupied_by_air: position_occupation.occupied_by_air
             }
