@@ -1,5 +1,5 @@
 use comcraft::constants::CHUNK;
-use comcraft::components::position::{Coord, VoxelCoord};
+use comcraft::models::position::{Coord, VoxelCoord};
 
 
 mod u64Helpers {

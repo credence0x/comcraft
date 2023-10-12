@@ -1,4 +1,4 @@
-use comcraft::components::position::{Coord, VoxelCoord};
+use comcraft::models::position::{Coord, VoxelCoord};
 use comcraft::constants::{Biome, STRUCTURE_CHUNK, STRUCTURE_CHUNK_CENTER};
 use comcraft::prototypes::blocks::{AirID, GrassID, DirtID, LogID, StoneID, SandID, GlassID, WaterID, CobblestoneID, MossyCobblestoneID, CoalID, CraftingID, IronID, GoldID, DiamondID, LeavesID, PlanksID, RedFlowerID, GrassPlantID, OrangeFlowerID, MagentaFlowerID, LightBlueFlowerID, LimeFlowerID, PinkFlowerID, GrayFlowerID, LightGrayFlowerID, CyanFlowerID, PurpleFlowerID, BlueFlowerID, GreenFlowerID, BlackFlowerID, KelpID, WoolID, OrangeWoolID, MagentaWoolID, LightBlueWoolID, YellowWoolID, LimeWoolID, PinkWoolID, GrayWoolID, LightGrayWoolID, CyanWoolID, PurpleWoolID, BlueWoolID, BrownWoolID, GreenWoolID, RedWoolID, BlackWoolID, SpongeID, SnowID, ClayID, BedrockID, BricksID};
 

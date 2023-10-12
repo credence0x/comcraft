@@ -1,14 +1,32 @@
-#[system]
-mod Occurence {
-    use comcraft::components::position::{VoxelCoord};
+#[dojo::contract]
+mod occurence_systems {
+    use comcraft::models::position::{VoxelCoord};
     use comcraft::libraries::terrain;
     use comcraft::prototypes::blocks;
 
-    use dojo::world::Context;
 
-    fn execute(ctx: Context, block_type: felt252, coord: VoxelCoord) -> felt252 {
-        get_occurrence(block_type, coord)
+    trait IOccurenceSystems<TContractState> {
+        fn check_occurence(
+            self: @TContractState, 
+            world: IWorldDispatcher, 
+            block_type: felt252, 
+            coord: VoxelCoord
+        ) -> felt252;
     }
+
+    #[external(v0)]
+    impl OccurenceSystemsImpl of IOccurenceSystems<ContractState> {
+
+        fn check_occurence(
+            self: @ContractState, 
+            world: IWorldDispatcher, 
+            block_type: felt252, 
+            coord: VoxelCoord
+        ) -> felt252 {
+            get_occurrence(block_type, coord)
+        }
+    }
+
 
     fn get_occurrence(block_type: felt252, coord: VoxelCoord) -> felt252 {
         if block_type == blocks::GrassID {return terrain::Grass(coord);}

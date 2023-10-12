@@ -1,19 +1,48 @@
-#[system]
-mod MakeClaim {
+#[dojo::contract]
+mod claim_systems {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Coord, VoxelCoord };
-    use comcraft::components::item::Item;
-    use comcraft::components::owned_by::OwnedBy;
-    use comcraft::components::claim::Claim;
-    use comcraft::components::stake::Stake;
-    use comcraft::systems::stake::{MakeStake};
+    use comcraft::models::position::{Coord, VoxelCoord };
+    use comcraft::models::item::Item;
+    use comcraft::models::owned_by::OwnedBy;
+    use comcraft::models::claim::Claim;
+    use comcraft::models::stake::Stake;
+    use comcraft::systems::stake::{stake_systems};
     use comcraft::utils::{u64Helpers, get_chunk_coord};
 
-    use dojo::world::Context;
 
-    use core::traits::Into;
-    use core::array::ArrayTrait;
-    use core::option::OptionTrait;
+    trait IClaimSystems<TContractState> {
+        fn make_claim(self: @TContractState, world: IWorldDispatcher, chunk: Coord );
+    }
+        
+    #[external(v0)]
+    impl ClaimSystemsImpl of IClaimSystems<ContractState> {
+
+        fn make_claim(self: @ContractState, world: IWorldDispatcher, chunk: Coord ) {
+            
+            let sender_stake_in_chunk: Stake = stake_systems::get_stake_in_chunk(
+                world, 
+                stake_systems::get_stake_entity(chunk, starknet::get_caller_address())
+            );
+
+            let current_claim_in_chunk: Claim = get_claim_in_chunk(world, chunk);
+
+            assert(
+                sender_stake_in_chunk.value > current_claim_in_chunk.stake, 
+                'not enough staked'
+            );
+
+            // Claim this chunk
+            let chunk_entity: ID = get_chunk_entity(chunk);
+            set!(world, (
+                Claim {
+                    id: chunk_entity, 
+                    stake: sender_stake_in_chunk.value, 
+                    claimer: starknet::get_caller_address()
+                }
+            ));
+        }
+    }
+
 
 
     // Chunk entity = concat(chunk.x | chunk.y)
@@ -29,20 +58,5 @@ mod MakeClaim {
         get_claim_in_chunk(world, get_chunk_coord(position))
     }
 
-
-    fn execute(ctx: Context, chunk: Coord ) {
-         
-        let sender_stake_in_chunk: Stake = MakeStake::get_stake_in_chunk(
-            ctx.world, 
-            MakeStake::get_stake_entity(chunk, ctx.origin)
-        );
-        let current_claim_in_chunk: Claim = get_claim_in_chunk(ctx.world, chunk);
-
-        assert(sender_stake_in_chunk.value > current_claim_in_chunk.stake, 'not enough staked');
-
-        // Claim this chunk
-        let chunk_entity: ID = get_chunk_entity(chunk);
-        set!(ctx.world, Claim {id: chunk_entity, stake: sender_stake_in_chunk.value, claimer: ctx.origin});
-    }
 
 }

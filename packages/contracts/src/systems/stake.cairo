@@ -1,22 +1,114 @@
-#[system]
-mod MakeStake {
+#[dojo::contract]
+mod stake_systems {
     use comcraft::alias::ID;
-    use comcraft::components::position::{Coord, VoxelCoord};
-    use comcraft::components::item::Item;
-    use comcraft::components::owned_by::OwnedBy;
-    use comcraft::components::claim::Claim;
-    use comcraft::components::stake::Stake;
+    use comcraft::models::position::{Coord, VoxelCoord};
+    use comcraft::models::item::Item;
+    use comcraft::models::owned_by::OwnedBy;
+    use comcraft::models::claim::Claim;
+    use comcraft::models::stake::Stake;
+
     use comcraft::prototypes::{blocks};
     use comcraft::utils::{u256Helpers, u64Helpers, get_chunk_coord};
     use starknet::ContractAddress;
     use starknet::contract_address_const;
+    
+    trait IStakeSystems<TContractState> {
+        fn stake(
+            self: @TContractState, 
+            world: IWorldDispatcher, 
+            block_id: ID, 
+            chunk: Coord
+        );
+
+        fn bulk_stake(
+            self: @TContractState, 
+            world: IWorldDispatcher, 
+            block_ids: Span<ID>, 
+            chunk: Coord
+        );
+    }
+
+    #[external(v0)]
+    impl StakeSystemsImpl of IStakeSystems<ContractState> {
+        fn stake(
+            self: @ContractState, 
+            world: IWorldDispatcher, 
+            block_id: ID, 
+            chunk: Coord
+        ) {
+            let block_owned_by = get!(world, block_id, OwnedBy);        
+            assert(block_owned_by.address == starknet::get_caller_address(), 'block not owned by player');
+
+            let block_item = get!(world, block_id, Item);
+            assert(block_item.value == blocks::DiamondID, 'can only stake diamond blocks');
+
+            // Remove block from inventory and place it in the world
+            set!(world, (
+                OwnedBy {
+                    id: block_id,
+                    address: contract_address_const::<0>()
+                })
+            );
+
+            // Increase stake in this chunk
+            let stake_id = get_stake_entity(chunk, starknet::get_caller_address());
+            let stake = get_stake_in_chunk(world, stake_id);
+            set!(world, (
+                Stake {
+                    id: stake_id,
+                    value: stake.value + 1
+                })
+            );
+        }
 
 
-    use dojo::world::Context;
 
-    use core::traits::Into;
-    use core::array::ArrayTrait;
-    use core::option::OptionTrait;
+
+   
+        fn bulk_stake(
+            self: @ContractState, 
+            world: IWorldDispatcher, 
+            block_ids: Span<ID>, 
+            chunk: Coord
+        ) {
+
+            let mut i = 0;
+            loop {
+                if i >= block_ids.len() {
+                    break;
+                }
+
+                let block_id = *block_ids[i];
+                let block_owned_by = get!(world, block_id, OwnedBy);        
+                assert(block_owned_by.address == starknet::get_caller_address(), 'block not owned by player');
+
+                // block must be diamond
+                let block_item = get!(world, block_id, Item);
+                assert(block_item.value == blocks::DiamondID, 'can only stake diamond blocks');
+
+                // Remove block from inventory and place it in the world
+                set!(world, (
+                    OwnedBy {
+                        id: block_id,
+                        address: contract_address_const::<0>()
+                    })
+                );
+
+                i+=1;
+            };
+
+
+            // Increase stake in this chunk
+            let stake_id = get_stake_entity(chunk, starknet::get_caller_address());
+            let stake = get_stake_in_chunk(world, stake_id);
+            set!(world, (
+                Stake {
+                    id: stake_id,
+                    value: stake.value + block_ids.len()
+                })
+            );
+        }
+    }
 
 
     // Stake entity = concat(address | chunk.x | chunk.y)
@@ -30,32 +122,7 @@ mod MakeStake {
         get!(world, stake_id, Stake)
     }
 
-    fn execute(ctx: Context, block_id: ID, chunk: Coord) {
 
-        let block_owned_by = get!(ctx.world, block_id, OwnedBy);        
-        assert(block_owned_by.address == ctx.origin, 'block not owned by player');
-
-        let block_item = get!(ctx.world, block_id, Item);
-        assert(block_item.value == blocks::DiamondID, 'can only stake diamond blocks');
-
-        // Remove block from inventory and place it in the world
-        set!(ctx.world, (
-            OwnedBy {
-                id: block_id,
-                address: contract_address_const::<0>()
-            })
-        );
-
-        // Increase stake in this chunk
-        let stake_id = get_stake_entity(chunk, ctx.origin);
-        let stake = get_stake_in_chunk(ctx.world, stake_id);
-        set!(ctx.world, (
-            Stake {
-                id: stake_id,
-                value: stake.value + 1
-            })
-        );
-    }
         
 }
 

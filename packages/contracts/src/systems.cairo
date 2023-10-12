@@ -1,12 +1,8 @@
 mod build;
 mod claim;
-mod stake;
+mod initialization;
+mod minecraft;
+mod name;
 mod occurrence;
+mod stake;
 mod transfer;
-mod mine;
-mod init;
-mod init2;
-mod creative_build;
-mod craft;
-mod bulk_transfer;
-mod bulk_stake;

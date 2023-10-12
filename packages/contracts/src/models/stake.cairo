@@ -1,4 +1,4 @@
-#[derive(Component, Copy, Drop, Serde, SerdeLen)]
+#[derive(Model, Copy, Drop, Serde)]
 struct Stake {
     #[key]
     id: u256,

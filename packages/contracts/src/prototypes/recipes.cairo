@@ -1,5 +1,5 @@
 use comcraft::prototypes::blocks;
-use comcraft::components::recipe::{Recipe, RecipeReverseLookup};
+use comcraft::models::recipe::{Recipe, RecipeReverseLookup};
 
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 

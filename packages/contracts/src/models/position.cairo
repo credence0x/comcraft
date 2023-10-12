@@ -1,4 +1,3 @@
-use dojo::serde::SerdeLen;
 
 use orion::numbers::signed_integer::i32::{i32, i32Impl};
 
@@ -36,7 +35,7 @@ impl VoxelCoordImpl of VoxelCoordTrait {
     }
 }
 
-#[derive(Component, Copy, Drop, Serde, SerdeLen)]
+#[derive(Model, Copy, Drop, Serde)]
 struct Position {
     #[key]
     id: u256,
@@ -59,7 +58,7 @@ impl PositionIntoVoxelCoord of Into<Position, VoxelCoord> {
 }
 
 
-#[derive(Component, Copy, Drop, Serde, SerdeLen)]
+#[derive(Model, Copy, Drop, Serde)]
 struct PositionOccupation {
     #[key]
     hash: felt252,
